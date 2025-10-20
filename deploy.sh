@@ -122,23 +122,14 @@ clone_or_update_repo() {
     log_info "=== STEP 2: Clone or Update Repository ==="
     
     local repo_name=$(basename "$GIT_REPO" .git)
-    local repo_dir="./${repo_name}"
+    local repo_dir="./app_${repo_name}_$(date +%s)"
     
     # Add PAT to repo URL for authentication
     local authenticated_url="${GIT_REPO/https:\/\//https:\/\/${PAT}@}"
     
-    if [[ -d "$repo_dir" ]]; then
-        log_info "Repository already exists at $repo_dir, pulling latest changes..."
-        cd "$repo_dir"
-        git checkout "$BRANCH" || git checkout -b "$BRANCH" origin/"$BRANCH"
-        git pull origin "$BRANCH"
-        cd ..
-        log_success "Repository updated"
-    else
-        log_info "Cloning repository..."
-        git clone --branch "$BRANCH" "$authenticated_url" "$repo_dir"
-        log_success "Repository cloned"
-    fi
+    log_info "Cloning repository..."
+    git clone --branch "$BRANCH" "$authenticated_url" "$repo_dir"
+    log_success "Repository cloned to $repo_dir"
     
     REPO_DIR="$repo_dir"
 }
